@@ -6,5 +6,5 @@ using UnityEngine;
 public class BulletSO : ScriptableObject
 {
     public float Speed;
-    public float Damage;
+    public int Damage;
 }

@@ -6,5 +6,7 @@ using UnityEngine;
 public class PowerUpSO : ScriptableObject
 {
     public PowerUpType PowerUptype;
-    public int Damage;
+    public int ExtraDamage;
+    public float BulletSpeed;
+    public int Timer;
 }

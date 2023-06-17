@@ -1,18 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PowerUpView : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private PowerUpController _powerUpController;
+    public void ApplyPowerUp()
     {
-        
+        _powerUpController.ApplyPowerUp();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetController(PowerUpController powerUpController)
     {
-        
+        _powerUpController = powerUpController;
     }
 }

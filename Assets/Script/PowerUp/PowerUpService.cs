@@ -41,8 +41,11 @@ public class PowerUpService : MonoBehaviour
             // Calculate the spawn position with the specified offset
             Vector3 spawnPosition = spawnPoint + new Vector3(randomOffset.x, randomOffset.y, 0f) + spawnOffset * Vector3.up;
 
+            var powerUpsCount = _powerUpViewList.PowerUps.Count;
+            var randomIndex = Random.Range(0, powerUpsCount);
+
             // Spawn the power-up object
-            Instantiate(_powerUpViewList.PowerUps[0], spawnPosition, Quaternion.identity);
+            Instantiate(_powerUpViewList.PowerUps[randomIndex], spawnPosition, Quaternion.identity);
         }
     }
 }

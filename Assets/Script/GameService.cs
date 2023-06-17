@@ -16,6 +16,9 @@ public class GameService : SingletonGeneric<GameService>
     public Action<Vector3> OnCursorMove;
     public Action<Transform> OnPressShoot;
     public Action SpawnEnemy;
+    public Action<int, int> OnIncreaseDamage;
+    public Action<float, int> OnIncreaseBulletSpeed;
+    public Action<int> OnActivateSheild;
     public PlayerService GetPlayerService() => _playerService;
     public EnemyService GetEnemyService() => _enemyService;
     public PowerUpService GetPowerUpService() => _powerUpService;
