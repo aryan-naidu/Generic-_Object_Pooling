@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController
 {
     private EnemyView _enemyView;
     private ScriptableObject _enemySO;
@@ -11,5 +11,6 @@ public class EnemyController : MonoBehaviour
     {
         _enemyView = enemyView;
         _enemySO = enemySO;
+
     }
 }

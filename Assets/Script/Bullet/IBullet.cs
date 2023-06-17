@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IBullet 
 {
-    public void Shoot(Vector2 direction, float Speed);
+    public void Shoot(Transform outt);
 }

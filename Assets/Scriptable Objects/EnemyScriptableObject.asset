@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e05b4a7cebf90cf4692ea822f65dcf7a, type: 3}
-  m_Name: PlayerSO
+  m_Script: {fileID: 11500000, guid: c5e2e580d60f3ed45abfb6b66a00dbdd, type: 3}
+  m_Name: EnemyScriptableObject
   m_EditorClassIdentifier: 
   Health: 100
-  RotationSpeed: 5
