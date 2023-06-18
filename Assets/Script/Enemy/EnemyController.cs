@@ -3,24 +3,35 @@ using UnityEngine;
 
 public class EnemyController
 {
+    private EnemyView _enemyView;
+    private EnemySO _enemySO;
     private Rigidbody _enemyRgbd;
     private Vector3 _target;
-    private EnemySO _enemySO;
-    private EnemyView _enemyView;
 
-    public EnemyController(EnemyView enemy, EnemySO enemyScriptableObject)
+    public EnemyController(EnemyView enemyPrefab, EnemySO enemySO)
     {
-        _enemySO = enemyScriptableObject;
-
-        Vector3 spawnPosition = GetRandomEdgeSpawnPosition();
-        _enemyView = GameObject.Instantiate(enemy, spawnPosition, Quaternion.identity);
+        _enemyView = GameObject.Instantiate(enemyPrefab);
+        _enemyView.transform.position = GetRandomEdgeSpawnPosition();
+        _enemySO = enemySO;
         _enemyRgbd = _enemyView.GetComponent<Rigidbody>();
 
-        // Because the player(target) is always at the center
-        _target = new Vector3(0, 0, 0);
+        Subscribe();
+    }
 
+    private void Subscribe()
+    {
+        // Subscribe to events
         _enemyView.OnDamage += ApplyDamage;
         _enemyView.MoveEnemy += MoveTowardsTarget;
+    }
+
+    public void Setup(EnemySO enemySO)
+    {
+        _enemySO.Health = enemySO.Health;
+        _enemyView.transform.position = GetRandomEdgeSpawnPosition();
+        _enemyView.gameObject.SetActive(true);
+
+        Subscribe();
     }
 
     private Vector3 GetRandomEdgeSpawnPosition()
@@ -96,6 +107,7 @@ public class EnemyController
     private IEnumerator DestroyEnemyObject()
     {
         yield return new WaitForSeconds(0.5f);
-        GameObject.Destroy(_enemyView.gameObject);
+          _enemyView.gameObject.SetActive(false);
+        EnemyPool.ReturnEnemy(this);
     }
 }

@@ -20,6 +20,7 @@ public class BulletPool
         if (_bulletPool.Count > 0)
         {
             bullet = _bulletPool.Dequeue();
+            bullet.Setup();
             bullet.Launch(outTransform);
         }
         else
@@ -32,7 +33,6 @@ public class BulletPool
     private static BulletController CreateNewBullet(Transform outTransform)
     {
         BulletController bullet = new BulletController(GameObject.Instantiate(_bulletPrefab), _bulletSO);
-        _bulletPool.Enqueue(bullet);
         bullet.Launch(outTransform);
         return bullet;
     }

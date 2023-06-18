@@ -8,13 +8,13 @@ public class EnemyService : MonoBehaviour
     [SerializeField] private int _initialDelayInSpawning = 2;
     [SerializeField] private int _delayBetweenSpawning = 2;
 
-    private EnemyController _enemyController;
     private int _enemiesSpawnedCount;
 
     public int _enemiesDestroyedCount;
 
     private void Start()
     {
+        EnemyPool.Initialize(_enemyView);
         StartCoroutine(SpawnEnemies());
     }
 
@@ -24,14 +24,14 @@ public class EnemyService : MonoBehaviour
 
         while (true)
         {
-            _enemyController = new EnemyController(_enemyView, _enemySO);
+            EnemyController enemyController = EnemyPool.GetEnemy(_enemySO);
 
             // For Updating the Gameplay UI
             _enemiesSpawnedCount++;
             GameService.instance.OnEnemiesSpawned?.Invoke(_enemiesSpawnedCount);
 
             // Wait for 1 second before spawning the next enemy
-            yield return new WaitForSeconds(_delayBetweenSpawning); 
+            yield return new WaitForSeconds(_delayBetweenSpawning);
         }
     }
 }
