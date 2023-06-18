@@ -11,13 +11,22 @@ public class BulletController
         _bulletSO = bulletSO;
         _bullet = bulletView;
 
+        Subscribe();
+    }
+
+    public void Setup()
+    {
+        _bullet.gameObject.SetActive(true);
+        Subscribe();
+    }
+
+    private void Subscribe()
+    {
         _bullet.OnBulletDispose += OnDispose;
     }
 
     public void Launch(Transform outTransform)
     {
-        _bullet.gameObject.SetActive(true);
-
         _bullet.transform.position = outTransform.position;
         _bullet.transform.rotation = outTransform.rotation * Quaternion.Euler(0f, 0f, 180f);
         _bullet.SetDamageValue(_bulletSO.Damage);
@@ -34,5 +43,6 @@ public class BulletController
     {
         _bullet.gameObject.SetActive(false);
         BulletPool.ReturnBullet(this);
+        _bullet.OnBulletDispose -= OnDispose;
     }
 }

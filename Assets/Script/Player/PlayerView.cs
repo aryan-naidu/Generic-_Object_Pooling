@@ -42,7 +42,7 @@ public class PlayerView : MonoBehaviour, IDamageble
     {
         if (other.gameObject.tag == "Enemy")
         {
-            Explode();
+           // Explode();
         }
     }
 

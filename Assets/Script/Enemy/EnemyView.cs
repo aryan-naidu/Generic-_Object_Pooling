@@ -8,10 +8,21 @@ public class EnemyView : MonoBehaviour, IDamageble
     public Action<int> OnDamage;
     public Action MoveEnemy;
 
+    private void OnEnable()
+    {
+        _explosion.SetActive(false);
+        GetComponent<BoxCollider>().enabled = true;
+    }
+
     private void Update()
     {
         // tell controller to apply move logic
         MoveEnemy?.Invoke();
+    }
+
+    public void SetHealth(int value)
+    {
+
     }
 
     public void Damage(float value)
