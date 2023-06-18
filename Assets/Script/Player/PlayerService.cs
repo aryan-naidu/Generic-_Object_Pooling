@@ -13,12 +13,19 @@ public class PlayerService : MonoBehaviour
 
     public void Start()
     {
-        _playerController = new PlayerController(_playerView, _playerSO,_bulletSO,_bulletView);
+        BulletPool.Initialize(_bulletView, _bulletSO);
+        _playerController = new PlayerController(_playerView, _playerSO);
+        _playerController.OnBulletFired += OnBulletFired;
     }
 
     public void OnBulletFired()
     {
         _bulletsFired++;
         GameService.instance.OnBulletsFired?.Invoke(_bulletsFired);
+    }
+
+    private void OnDestroy()
+    {
+        _playerController.OnBulletFired -= OnBulletFired;
     }
 }

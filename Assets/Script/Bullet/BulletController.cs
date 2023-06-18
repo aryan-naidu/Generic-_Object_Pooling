@@ -1,28 +1,38 @@
+using System;
 using UnityEngine;
 
-public class BulletController : IBullet
+public class BulletController
 {
     private BulletView _bullet;
     private BulletSO _bulletSO;
 
-    public BulletController(BulletView bulletView, BulletSO bulletSO, Transform outTransform)
+    public BulletController(BulletView bulletView, BulletSO bulletSO)
     {
         _bulletSO = bulletSO;
         _bullet = bulletView;
 
-        InstantiateAndLaunch(outTransform);
+        _bullet.OnBulletDispose += OnDispose;
     }
 
-    public void InstantiateAndLaunch(Transform outTransform)
+    public void Launch(Transform outTransform)
     {
-        var bullet = GameObject.Instantiate(_bullet, outTransform.position, outTransform.rotation * Quaternion.Euler(0f, 0f, 180f));
-        bullet.SetDamageValue(_bulletSO.Damage);
+        _bullet.gameObject.SetActive(true);
 
-        Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
-        Vector3 direction = -outTransform.up; // Get the direction from the shooter's up vector
+        _bullet.transform.position = outTransform.position;
+        _bullet.transform.rotation = outTransform.rotation * Quaternion.Euler(0f, 0f, 180f);
+        _bullet.SetDamageValue(_bulletSO.Damage);
+
+        Rigidbody bulletRigidbody = _bullet.GetComponent<Rigidbody>();
+        Vector3 direction = -outTransform.up;
         bulletRigidbody.velocity = direction * _bulletSO.Speed;
 
         // For updating the gameplay UI
         GameService.instance.GetPlayerService().OnBulletFired();
+    }
+
+    public void OnDispose()
+    {
+        _bullet.gameObject.SetActive(false);
+        BulletPool.ReturnBullet(this);
     }
 }

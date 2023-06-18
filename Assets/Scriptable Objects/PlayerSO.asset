@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e05b4a7cebf90cf4692ea822f65dcf7a, type: 3}
   m_Name: PlayerSO
   m_EditorClassIdentifier: 
+  _bulletSO: {fileID: 11400000, guid: 21093421c84a04244b56de769111a85a, type: 2}
   Health: 100
-  RotationSpeed: 5

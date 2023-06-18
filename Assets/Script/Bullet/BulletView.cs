@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 public class BulletView : MonoBehaviour
 {
     private int _damageValue;
+    public Action OnBulletDispose;
 
    public void SetDamageValue(int damageValue)
     {
@@ -17,7 +19,7 @@ public class BulletView : MonoBehaviour
             if (powerUpView != null)
             {
                 powerUpView.ApplyPowerUp();
-                Destroy(gameObject);
+                OnBulletDispose?.Invoke();
             }
         }
         if (collision.gameObject.CompareTag("Enemy"))
@@ -26,7 +28,7 @@ public class BulletView : MonoBehaviour
             if (enemyView != null)
             {
                 enemyView.Damage(_damageValue);
-                Destroy(gameObject);
+                OnBulletDispose?.Invoke();
             }
         }
     }
