@@ -6,5 +6,4 @@ using UnityEngine;
 public class PlayerSO : ScriptableObject
 {
     public int Health;
-    public float RotationSpeed;
 }

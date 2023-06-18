@@ -1,30 +1,47 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController
 {
-    private BulletController _bulletController;
+    //Player related
     private PlayerView _playerView;
     private PlayerSO _playerSO;
 
-    private float _rotationSpeed;
+    //Bullets Related
+    private BulletView _bulletView;
+    private BulletSO _bulletSO;
+    private float _originalBulletSpeed;
+    private float _currentBulletSpeed;
+    private int _originalBulletDamage;
+    private int _currentBulletDamage;
 
-    public PlayerController(PlayerView playerView, PlayerSO playerSO, BulletController bulletController)
+    public PlayerController(PlayerView playerView, PlayerSO playerSO, BulletSO bulletSO, BulletView bulletView)
     {
-        _playerView = playerView;
         _playerSO = playerSO;
-        _bulletController = bulletController;
-        _rotationSpeed = _playerSO.RotationSpeed;
+        _bulletSO = bulletSO;
+        _bulletView = bulletView;
 
-        GameService.instance.OnCursorMove += RotatePlayer;
-        GameService.instance.OnPressShoot += FireBullet;
+        _originalBulletSpeed = _currentBulletSpeed = _bulletSO.Speed;
+        _originalBulletDamage = _currentBulletDamage = _bulletSO.Damage;
 
+        //Instantiate player at the center
+        _playerView = GameObject.Instantiate(playerView);
+        _playerView.transform.position = new Vector3(0, 0, 0);
+
+        _playerView.OnCursorMove += RotatePlayer;
+        _playerView.OnPressShoot += FireBullet;
+        _playerView.OnDispose += UnSubscribe;
+
+        // Bullet related
+        GameService.instance.OnIncreaseBulletSpeed += IncreaseBulletSpeed;
+        GameService.instance.OnIncreaseBulletDamage += IncreaseBulletDamage;
+        GameService.instance.OnResetBulletSpeed += ResetBulletSpeed;
+        GameService.instance.OnResetBulletDamage += ResetBulletDamage;
     }
 
-    private void RotatePlayer(Vector3 direction)
+    #region Player Input Functionality
+    private void RotatePlayer(Vector3 mousePosition)
     {
-       
+        Vector3 direction = mousePosition - _playerView.transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         // Adjust the angle to face the cursor correctly
@@ -33,13 +50,46 @@ public class PlayerController
         _playerView.transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    private void FireBullet(Transform outt)
+    private void FireBullet(Transform outTransform)
     {
-        _bulletController.Shoot(outt);
+        new BulletController(_bulletView, _bulletSO, outTransform);
+    }
+    #endregion
+
+    #region Powerups Related
+    private void IncreaseBulletSpeed(float value)
+    {
+        _currentBulletSpeed += value;
+        _bulletSO.Speed = _currentBulletSpeed;
     }
 
-    public Transform GetPlayerTransform()
+    private void IncreaseBulletDamage(int value)
     {
-        return _playerView.transform;
+        _currentBulletDamage += value;
+        _bulletSO.Damage = _currentBulletDamage;
+    }
+
+    private void ResetBulletSpeed()
+    {
+        _currentBulletSpeed = _bulletSO.Speed = _originalBulletSpeed;
+    }
+
+    private void ResetBulletDamage()
+    {
+        _currentBulletDamage = _bulletSO.Damage = _originalBulletDamage;
+    }
+    #endregion
+
+    // UnSubscribe
+    public void UnSubscribe()
+    {
+        _playerView.OnCursorMove -= RotatePlayer;
+        _playerView.OnPressShoot -= FireBullet;
+        _playerView.OnDispose -= UnSubscribe;
+
+        GameService.instance.OnIncreaseBulletSpeed -= IncreaseBulletSpeed;
+        GameService.instance.OnIncreaseBulletDamage -= IncreaseBulletDamage;
+        GameService.instance.OnResetBulletSpeed -= ResetBulletSpeed;
+        GameService.instance.OnResetBulletDamage -= ResetBulletDamage;
     }
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerService : MonoBehaviour
@@ -10,14 +8,17 @@ public class PlayerService : MonoBehaviour
     [SerializeField] private BulletSO _bulletSO;
 
     private PlayerController _playerController;
-    private BulletController _bulletController;
-    public PlayerController GetPlayerController() => _playerController;
+
+    private int _bulletsFired;
 
     public void Start()
     {
-        _bulletController = new BulletController(_bulletView, _bulletSO);
-        _playerController = new PlayerController(_playerView, _playerSO, _bulletController);
-        var player = Instantiate(_playerView);
-        player.transform.position = new Vector3(0, 0, 0);
+        _playerController = new PlayerController(_playerView, _playerSO,_bulletSO,_bulletView);
+    }
+
+    public void OnBulletFired()
+    {
+        _bulletsFired++;
+        GameService.instance.OnBulletsFired?.Invoke(_bulletsFired);
     }
 }

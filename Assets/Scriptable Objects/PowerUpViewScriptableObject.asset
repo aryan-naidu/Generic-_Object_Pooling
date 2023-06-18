@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PowerUpViewScriptableObject
   m_EditorClassIdentifier: 
   PowerUps:
-  - {fileID: -7605954049943140909, guid: 92af7510e0258124795f74933623b9a8, type: 3}
   - {fileID: 1570096911945484199, guid: b172b0ff8cc62b944b7a6e1e651d8e9c, type: 3}
+  - {fileID: -7605954049943140909, guid: 92af7510e0258124795f74933623b9a8, type: 3}
   - {fileID: 9112675263900839098, guid: 4ba087ffbad3a18408d837dfdcc82fdc, type: 3}

@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
 public class GameService : SingletonGeneric<GameService>
 {
     [SerializeField] private PlayerService _playerService;
@@ -13,17 +10,23 @@ public class GameService : SingletonGeneric<GameService>
     [SerializeField] private VfxService _vfxService;
     [SerializeField] private UiView _uiView;
 
-    public Action<Vector3> OnCursorMove;
-    public Action<Transform> OnPressShoot;
     public Action SpawnEnemy;
-    public Action<int, int> OnIncreaseDamage;
-    public Action<float, int> OnIncreaseBulletSpeed;
-    public Action<int> OnActivateSheild;
+    // Powerups Related
+    public Action<int> OnIncreaseBulletDamage;
+    public Action<float> OnIncreaseBulletSpeed;
+    public Action OnResetBulletDamage;
+    public Action OnResetBulletSpeed;
+    public Action OnActivateSheild;
+    public Action OnDeactivateShield;
+    // Gameplay UI Related
+    public Action<int> OnBulletsFired;
+    public Action<int> OnEnemiesSpawned;
+    public Action<int> OnEnemiesKilled;
+
     public PlayerService GetPlayerService() => _playerService;
     public EnemyService GetEnemyService() => _enemyService;
     public PowerUpService GetPowerUpService() => _powerUpService;
     public SoundService GetSoundService() => _soundService;
     public VfxService GetVfxService() => _vfxService;
     public UiView GetUiView() => _uiView;
-
 }

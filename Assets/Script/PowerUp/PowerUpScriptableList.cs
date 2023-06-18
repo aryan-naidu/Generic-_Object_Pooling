@@ -7,3 +7,4 @@ public class PowerUpScriptableList : ScriptableObject
 {
     public List<PowerUpSO> PowerUpSoList;
 }
+

@@ -17,3 +17,4 @@ public class SingletonGeneric<T> : MonoBehaviour where T : SingletonGeneric<T>
         }
     }
 }
+

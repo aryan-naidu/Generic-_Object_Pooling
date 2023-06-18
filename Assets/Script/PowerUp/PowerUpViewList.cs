@@ -7,3 +7,4 @@ public class PowerUpViewList : ScriptableObject
 {
     public List<PowerUpView> PowerUps;
 }
+

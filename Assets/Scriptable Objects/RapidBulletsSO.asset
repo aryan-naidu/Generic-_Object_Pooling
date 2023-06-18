@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: RapidBulletsSO
   m_EditorClassIdentifier: 
   PowerUptype: 2
-  Damage: 10
+  ExtraDamage: 0
+  BulletSpeed: 3
+  Timer: 3

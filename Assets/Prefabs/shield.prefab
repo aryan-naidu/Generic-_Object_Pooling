@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 1430884104162461887}
   - component: {fileID: 7729275900475125543}
   - component: {fileID: 9112675263900839098}
+  - component: {fileID: 5495867892042695554}
   m_Layer: 0
   m_Name: shield
-  m_TagString: Untagged
+  m_TagString: PowerUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,3 +96,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94b27dcb8e2b4bb4a95d1bf2fffcc5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &5495867892042695554
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6874865345112044004}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.34, y: 0.33, z: 0.2}
+  m_Center: {x: 0, y: 0, z: 0}

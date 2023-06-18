@@ -1,19 +1,17 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class PlayerView : MonoBehaviour,IDamageble
+public class PlayerView : MonoBehaviour, IDamageble
 {
-    [SerializeField] Transform _shooter;
-    private Transform _cachedTransform;
-    private Camera _mainCamera;
-    private PlayerController _playerController;
+    [SerializeField] private Transform _bulletOriginTransform;
+    [SerializeField] private GameObject _explosion;
 
-    private void Awake()
-    {
-        _mainCamera = Camera.main;
-        _cachedTransform = transform;
-    }
+    // For Notifying The Controller
+    public Action<Vector3> OnCursorMove;
+    public Action<Transform> OnPressShoot;
+    public Action OnDispose;
 
     private void Update()
     {
@@ -21,26 +19,52 @@ public class PlayerView : MonoBehaviour,IDamageble
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            GameService.Instance.OnPressShoot?.Invoke(_shooter);
+            OnPressSpace();
         }
     }
 
+    #region Player Inputs
     private void RotateTowardsMousePosition()
     {
         Vector3 mousePosition = Input.mousePosition;
         mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
 
-        Vector3 direction = mousePosition - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        OnCursorMove?.Invoke(mousePosition);
+    }
 
-        // Adjust the angle to face the cursor correctly
-        angle += 90f;
+    private void OnPressSpace()
+    {
+        OnPressShoot?.Invoke(_bulletOriginTransform);
+    }
+    #endregion
 
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            Explode();
+        }
+    }
+
+    public void Explode()
+    {
+        _explosion.SetActive(true);
+        StartCoroutine(GameOver());
+    }
+
+    private IEnumerator GameOver()
+    {
+        yield return new WaitForSeconds(0.5f);
+        GameService.instance.GetUiView().EnableGameOverScreen();
     }
 
     public void Damage(float value)
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        OnDispose?.Invoke();
     }
 }

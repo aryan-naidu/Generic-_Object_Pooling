@@ -1,48 +1,37 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyService : MonoBehaviour
 {
-    [SerializeField] private ScriptableObject _enemySO;
+    [SerializeField] private EnemySO _enemySO;
     [SerializeField] private EnemyView _enemyView;
-    private EnemyController _enemyController;
-    public float initialDelay=2;
-    public float spawnInterval=2;
-    public float spawnDistance=10;
+    [SerializeField] private int _initialDelayInSpawning = 2;
+    [SerializeField] private int _delayBetweenSpawning = 2;
 
-    private Transform playerTransform;
-    private int enemyCount;
+    private EnemyController _enemyController;
+    private int _enemiesSpawnedCount;
+
+    public int _enemiesDestroyedCount;
 
     private void Start()
     {
-        enemyCount = 1;
-
         StartCoroutine(SpawnEnemies());
     }
 
     private IEnumerator SpawnEnemies()
     {
-        yield return new WaitForSeconds(initialDelay);
+        yield return new WaitForSeconds(_initialDelayInSpawning);
 
         while (true)
         {
-            for (int i = 0; i < enemyCount; i++)
-            {
-                Vector2 randomOffset = Random.insideUnitCircle.normalized * 11;
-                Vector3 spawnPosition = new Vector3(randomOffset.x, randomOffset.y, 0f);
+            _enemyController = new EnemyController(_enemyView, _enemySO);
 
-                Instantiate(_enemyView, spawnPosition, Quaternion.identity);
-            }
+            // For Updating the Gameplay UI
+            _enemiesSpawnedCount++;
+            GameService.instance.OnEnemiesSpawned?.Invoke(_enemiesSpawnedCount);
 
-            enemyCount++;
-            yield return new WaitForSeconds(spawnInterval);
+            // Wait for 1 second before spawning the next enemy
+            yield return new WaitForSeconds(_delayBetweenSpawning); 
         }
     }
-
-    public EnemyService()
-    {
-        _enemyController = new EnemyController(_enemyView, _enemySO);
-    }
-
 }

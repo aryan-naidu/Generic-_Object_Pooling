@@ -1,14 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletView : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
+    private int _damageValue;
+
+   public void SetDamageValue(int damageValue)
     {
-        if (collision.gameObject.tag == "powerUp")
+        _damageValue = damageValue;
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("PowerUp"))
         {
-            collision.gameObject.GetComponent<PowerUpView>().ApplyPowerUp();
+            PowerUpView powerUpView = collision.gameObject.GetComponent<PowerUpView>();
+            if (powerUpView != null)
+            {
+                powerUpView.ApplyPowerUp();
+                Destroy(gameObject);
+            }
+        }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            EnemyView enemyView = collision.gameObject.GetComponent<EnemyView>();
+            if (enemyView != null)
+            {
+                enemyView.Damage(_damageValue);
+                Destroy(gameObject);
+            }
         }
     }
 }

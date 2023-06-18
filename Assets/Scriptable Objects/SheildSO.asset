@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: SheildSO
   m_EditorClassIdentifier: 
   PowerUptype: 1
-  Damage: 0
+  ExtraDamage: 0
+  BulletSpeed: 0
+  Timer: 5

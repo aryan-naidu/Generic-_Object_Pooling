@@ -1,30 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class EnemyView : MonoBehaviour, IDamageble
 {
-    private Vector3 target;
-    private void Start()
-    {
-        target = new Vector3(0, 0, 0);
-    }
-    public void Damage(float value)
-    {
+    [SerializeField] private GameObject _explosion;
 
-    }
+    public Action<int> OnDamage;
+    public Action MoveEnemy;
+
     private void Update()
     {
-        Vector3 direction = target - transform.position;
-        direction.Normalize();  // Normalize the direction vector to have a magnitude of 1
-
-        transform.Translate(direction * 3 * Time.deltaTime);
+        // tell controller to apply move logic
+        MoveEnemy?.Invoke();
     }
-    public void OnCollisionEnter(Collision collision)
+
+    public void Damage(float value)
     {
-        if (collision.gameObject.tag == "bullet")
-        {
-            Damage(1f);
-        }
+        OnDamage((int)value);
+    }
+
+    public void Explode()
+    {
+        _explosion.SetActive(true);
     }
 }

@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: DoubleCannonSO
   m_EditorClassIdentifier: 
   PowerUptype: 0
-  Damage: 20
+  ExtraDamage: 25
+  BulletSpeed: 0
+  Timer: 3
