@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerController
@@ -12,10 +13,13 @@ public class PlayerController
     private int _originalBulletDamage;
     private int _currentBulletDamage;
 
-    public event System.Action OnBulletFired;
+    private BulletController _bulletController;
 
-    public PlayerController(PlayerView playerView, PlayerSO playerSO)
+    public Action OnBulletFired;
+
+    public PlayerController(PlayerView playerView, PlayerSO playerSO, BulletController bulletController)
     {
+        _bulletController = bulletController;
         _playerSO = playerSO;
         _playerView = GameObject.Instantiate(playerView);
         _playerView.transform.position = new Vector3(0, 0, 0);
@@ -44,7 +48,7 @@ public class PlayerController
 
     private void FireBullet(Transform outTransform)
     {
-       BulletPool.GetBullet(outTransform);
+        _bulletController.Launch(outTransform);
     }
 
     #endregion

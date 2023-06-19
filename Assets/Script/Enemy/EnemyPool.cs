@@ -3,40 +3,41 @@ using UnityEngine;
 
 public class EnemyPool
 {
-    private static EnemyView _enemy;
-    private static Queue<EnemyController> _enemyPool = new Queue<EnemyController>();
+    private static EnemyView _enemyPrefab;
+    private static Queue<EnemyView> _enemyPool = new Queue<EnemyView>();
 
     public static void Initialize(EnemyView enemyPrefab)
     {
-        _enemy = enemyPrefab;
+        _enemyPrefab = enemyPrefab;
     }
 
-    public static EnemyController GetEnemy(EnemySO enemySO)
+    public static EnemyView GetEnemy()
     {
-        EnemyController enemy;
+        EnemyView enemy;
 
         if (_enemyPool.Count > 0)
-         {
-            Debug.Log("reusing");
+        {
             enemy = _enemyPool.Dequeue();
-            enemy.Setup(enemySO);
+            enemy.gameObject.SetActive(true);
+            Debug.Log("resusing");
         }
         else
         {
-            enemy = CreateNewEnemy(enemySO);
+            enemy = CreateNewEnemy();
         }
         return enemy;
     }
 
-    private static EnemyController CreateNewEnemy(EnemySO enemySO)
+    private static EnemyView CreateNewEnemy()
     {
-        Debug.Log("created new");
-        EnemyController enemy = new EnemyController(_enemy, enemySO);
+        Debug.Log("new");
+        EnemyView enemy = GameObject.Instantiate(_enemyPrefab);
         return enemy;
     }
 
-    public static void ReturnEnemy(EnemyController enemy)
+    public static void ReturnEnemy(EnemyView enemy)
     {
+        enemy.gameObject.SetActive(false);
         _enemyPool.Enqueue(enemy);
     }
 }

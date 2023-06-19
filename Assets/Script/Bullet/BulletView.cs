@@ -19,7 +19,7 @@ public class BulletView : MonoBehaviour
             if (powerUpView != null)
             {
                 powerUpView.ApplyPowerUp();
-                OnBulletDispose?.Invoke();
+                BulletPool.ReturnBullet(this);
             }
         }
         if (collision.gameObject.CompareTag("Enemy"))
@@ -28,7 +28,7 @@ public class BulletView : MonoBehaviour
             if (enemyView != null)
             {
                 enemyView.Damage(_damageValue);
-                OnBulletDispose?.Invoke();
+                BulletPool.ReturnBullet(this);
             }
         }
     }

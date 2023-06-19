@@ -4,41 +4,40 @@ using UnityEngine;
 public class BulletPool
 {
     private static BulletView _bulletPrefab;
-    private static BulletSO _bulletSO;
-    private static Queue<BulletController> _bulletPool = new Queue<BulletController>();
+    private static Queue<BulletView> _bulletPool = new Queue<BulletView>();
 
-    public static void Initialize(BulletView bulletPrefab, BulletSO bulletSO)
+    public static void Initialize(BulletView bulletPrefab)
     {
         _bulletPrefab = bulletPrefab;
-        _bulletSO = bulletSO;
     }
 
-    public static BulletController GetBullet(Transform outTransform)
+    public static BulletView GetBullet()
     {
-        BulletController bullet;
+        BulletView bullet;
 
         if (_bulletPool.Count > 0)
         {
+            Debug.Log("reuisng");
             bullet = _bulletPool.Dequeue();
-            bullet.Setup();
-            bullet.Launch(outTransform);
+            bullet.gameObject.SetActive(true);
         }
         else
         {
-            bullet = CreateNewBullet(outTransform);
+            bullet = CreateNewBullet();
         }
         return bullet;
     }
 
-    private static BulletController CreateNewBullet(Transform outTransform)
+    private static BulletView CreateNewBullet()
     {
-        BulletController bullet = new BulletController(GameObject.Instantiate(_bulletPrefab), _bulletSO);
-        bullet.Launch(outTransform);
+        Debug.Log("new");
+        BulletView bullet = GameObject.Instantiate(_bulletPrefab);
         return bullet;
     }
 
-    public static void ReturnBullet(BulletController bullet)
+    public static void ReturnBullet(BulletView bullet)
     {
+        bullet.gameObject.SetActive(false);
         _bulletPool.Enqueue(bullet);
     }
 }
