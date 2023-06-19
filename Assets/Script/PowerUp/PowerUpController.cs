@@ -5,22 +5,41 @@ using System;
 
 public class PowerUpController
 {
-    private PowerUpView _powerUpView;
-    private PowerUpSO _powerUpSO;
-    private GameService _gameService;
-
+    private PowerUpViewList _powerUpViewList;
+    private PowerUpScriptableList _powerUpSOList;
+    private float _spawnInterval;
     private float _minSpawnDistanceFromPlayer = 3f;
-    public 
-        Action<PowerUpType> OnPowerUpExpired;
 
-    public PowerUpController(PowerUpView powerUpView, PowerUpSO powerUpSO)
+    public PowerUpController(PowerUpViewList powerUpViewList,PowerUpScriptableList powerUpScriptableList, float spawnDelay)
     {
-        _powerUpView = GameObject.Instantiate(powerUpView);
-        _powerUpView.transform.position = GetRandomSpawnPoint();
-        _powerUpSO = powerUpSO;
-        _gameService = GameService.Instance;
+        _spawnInterval = spawnDelay;
 
-        _powerUpView.ActivatePowerUp += ActivatePowerUp;
+        StartSpawning();
+
+        _powerUpViewList = powerUpViewList;
+        _powerUpSOList = powerUpScriptableList;
+    }
+
+    private void StartSpawning()
+    {
+        GameService.Instance.StartCoroutine(SpawnPowerUps());
+    }
+
+    private IEnumerator SpawnPowerUps()
+    {
+        yield return new WaitForSeconds(_spawnInterval);
+
+        while (true)
+        {
+            int powerUpCount = _powerUpViewList.PowerUps.Count;
+
+            int randomIndex = UnityEngine.Random.Range(0, powerUpCount);
+            PowerUpType powerUpType = _powerUpSOList.PowerUpSoList[randomIndex].PowerUptype;
+            PowerUpView powerUpView = PowerUpPool.GetPowerUp(powerUpType);
+            powerUpView.transform.position = GetRandomSpawnPoint();
+
+            yield return new WaitForSeconds(_spawnInterval);
+        }
     }
 
     private Vector3 GetRandomSpawnPoint()
@@ -46,52 +65,5 @@ public class PowerUpController
         }
 
         return randomPoint;
-    }
-
-    public void ActivatePowerUp()
-    {
-        _powerUpView.ActivatePowerUp -= ActivatePowerUp;
-
-      _gameService.StartCoroutine(PowerUpCoroutine());
-    }
-
-    private IEnumerator PowerUpCoroutine()
-    {
-        switch (_powerUpSO.PowerUptype)
-        {
-            case PowerUpType.DoubleCannon:
-                GameService.Instance.OnIncreaseBulletDamage?.Invoke(_powerUpSO.ExtraDamage);
-                break;
-
-            case PowerUpType.RapidBullets:
-                GameService.Instance.OnIncreaseBulletSpeed?.Invoke(_powerUpSO.BulletSpeed);
-                break;
-
-            case PowerUpType.Shield:
-                GameService.Instance.OnActivateSheild?.Invoke();
-                break;
-        }
-
-        yield return new WaitForSeconds(_powerUpSO.Timer);
-
-        switch (_powerUpSO.PowerUptype)
-        {
-            case PowerUpType.DoubleCannon:
-                GameService.Instance.OnResetBulletDamage?.Invoke();
-                break;
-
-            case PowerUpType.RapidBullets:
-                GameService.Instance.OnResetBulletSpeed?.Invoke();
-                break;
-
-            case PowerUpType.Shield:
-                GameService.Instance.OnDeactivateShield?.Invoke();
-                break;
-        }
-
-        if (OnPowerUpExpired != null)
-        {
-            OnPowerUpExpired?.Invoke(_powerUpSO.PowerUptype);
-        }
     }
 }

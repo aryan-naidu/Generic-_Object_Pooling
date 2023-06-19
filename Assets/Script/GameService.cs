@@ -53,10 +53,7 @@ public class GameService : SingletonGeneric<GameService>
     {
         InitializeServices();
     }
-    private void Update()
-    {
-        _powerUpService.OnUpdate();
-    }
+
     private void InitializeServices()
     {
         _playerService = new PlayerService(_playerView, _playerSO, _bulletView, _bulletSO);

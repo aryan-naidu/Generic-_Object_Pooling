@@ -14,6 +14,7 @@ public class ObjectPool<T> where T : MonoBehaviour
     public T GetObject()
     {
         T obj = SearchPool();
+
         if (obj == null)
         {
             obj = CreateNewObject();
