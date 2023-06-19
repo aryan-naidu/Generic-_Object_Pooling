@@ -8,13 +8,15 @@ public class PlayerService : MonoBehaviour
     [SerializeField] private BulletSO _bulletSO;
 
     private PlayerController _playerController;
+    private BulletController _bulletController;
 
     private int _bulletsFired;
 
     public void Start()
     {
-        BulletPool.Initialize(_bulletView, _bulletSO);
-        _playerController = new PlayerController(_playerView, _playerSO);
+        BulletPool.Initialize(_bulletView);
+        _bulletController = new BulletController(_bulletSO);
+        _playerController = new PlayerController(_playerView, _playerSO, _bulletController);
         _playerController.OnBulletFired += OnBulletFired;
     }
 

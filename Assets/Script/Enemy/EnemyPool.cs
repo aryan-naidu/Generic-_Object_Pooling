@@ -17,7 +17,6 @@ public class EnemyPool
 
         if (_enemyPool.Count > 0)
          {
-            Debug.Log("reusing");
             enemy = _enemyPool.Dequeue();
             enemy.Setup(enemySO);
         }
@@ -30,7 +29,6 @@ public class EnemyPool
 
     private static EnemyController CreateNewEnemy(EnemySO enemySO)
     {
-        Debug.Log("created new");
         EnemyController enemy = new EnemyController(_enemy, enemySO);
         return enemy;
     }
