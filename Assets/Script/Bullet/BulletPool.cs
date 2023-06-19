@@ -1,43 +1,30 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPool
+public class BulletPool : GenericObjectPool<BulletView>
 {
-    private static BulletView _bulletPrefab;
-    private static Queue<BulletView> _bulletPool = new Queue<BulletView>();
+    private static BulletPool _instance;
+
+    // It takes a BulletView prefab as a parameter and passes it to the base class constructor (base(prefab)).
+    private BulletPool(BulletView prefab) : base(prefab) { }
 
     public static void Initialize(BulletView bulletPrefab)
     {
-        _bulletPrefab = bulletPrefab;
+        if (_instance != null)
+        {
+            Debug.LogWarning("BulletPool is already initialized!");
+            return;
+        }
+
+        _instance = new BulletPool(bulletPrefab);
     }
 
     public static BulletView GetBullet()
     {
-        BulletView bullet;
-
-        if (_bulletPool.Count > 0)
-        {
-            Debug.Log("reuisng");
-            bullet = _bulletPool.Dequeue();
-            bullet.gameObject.SetActive(true);
-        }
-        else
-        {
-            bullet = CreateNewBullet();
-        }
-        return bullet;
-    }
-
-    private static BulletView CreateNewBullet()
-    {
-        Debug.Log("new");
-        BulletView bullet = GameObject.Instantiate(_bulletPrefab);
-        return bullet;
+        return _instance.GetObject();
     }
 
     public static void ReturnBullet(BulletView bullet)
     {
-        bullet.gameObject.SetActive(false);
-        _bulletPool.Enqueue(bullet);
+        _instance.ReturnObject(bullet);
     }
 }
