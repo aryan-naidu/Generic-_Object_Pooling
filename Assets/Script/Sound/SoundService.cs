@@ -1,8 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SoundService : MonoBehaviour 
+public class SoundService 
 {
-    [SerializeField] private SoundScriptableList _soundScriptableList;
+    private SoundScriptableList soundScriptableList;
+
+    public SoundService()
+    {
+
+    }
+
+    public SoundService(SoundScriptableList soundScriptableList)
+    {
+        this.soundScriptableList = soundScriptableList;
+    }
 }

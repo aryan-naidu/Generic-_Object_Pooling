@@ -19,10 +19,12 @@ public class BulletController : IBullet
         bullet.SetDamageValue(_bulletSO.Damage);
 
         Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
-        Vector3 direction = -outTransform.up; // Get the direction from the shooter's up vector
+
+        // Get the direction from the shooter's up vector
+        Vector3 direction = -outTransform.up;
         bulletRigidbody.velocity = direction * _bulletSO.Speed;
 
         // For updating the gameplay UI
-        GameService.instance.GetPlayerService().OnBulletFired();
+        GameService.Instance.GetPlayerService().OnBulletFired();
     }
 }

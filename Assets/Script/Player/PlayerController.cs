@@ -14,28 +14,33 @@ public class PlayerController
     private int _originalBulletDamage;
     private int _currentBulletDamage;
 
+    private GameService _gameService;
+
     public PlayerController(PlayerView playerView, PlayerSO playerSO, BulletSO bulletSO, BulletView bulletView)
     {
         _playerSO = playerSO;
         _bulletSO = bulletSO;
         _bulletView = bulletView;
+        _gameService = GameService.Instance;
 
+        // Fo setting and resetting powerups effects
         _originalBulletSpeed = _currentBulletSpeed = _bulletSO.Speed;
         _originalBulletDamage = _currentBulletDamage = _bulletSO.Damage;
 
         //Instantiate player at the center
         _playerView = GameObject.Instantiate(playerView);
         _playerView.transform.position = new Vector3(0, 0, 0);
-
+              
+        // Events happening with the player
         _playerView.OnCursorMove += RotatePlayer;
         _playerView.OnPressShoot += FireBullet;
-        _playerView.OnDispose += UnSubscribe;
+        _playerView.OnDispose += Unsubscribe;
 
         // Bullet related
-        GameService.instance.OnIncreaseBulletSpeed += IncreaseBulletSpeed;
-        GameService.instance.OnIncreaseBulletDamage += IncreaseBulletDamage;
-        GameService.instance.OnResetBulletSpeed += ResetBulletSpeed;
-        GameService.instance.OnResetBulletDamage += ResetBulletDamage;
+        _gameService.OnIncreaseBulletSpeed += IncreaseBulletSpeed;
+        _gameService.OnIncreaseBulletDamage += IncreaseBulletDamage;
+        _gameService.OnResetBulletSpeed += ResetBulletSpeed;
+        _gameService.OnResetBulletDamage += ResetBulletDamage;
     }
 
     #region Player Input Functionality
@@ -80,16 +85,16 @@ public class PlayerController
     }
     #endregion
 
-    // UnSubscribe
-    public void UnSubscribe()
+    // Unsubscribe
+    public void Unsubscribe()
     {
         _playerView.OnCursorMove -= RotatePlayer;
         _playerView.OnPressShoot -= FireBullet;
-        _playerView.OnDispose -= UnSubscribe;
+        _playerView.OnDispose -= Unsubscribe;
 
-        GameService.instance.OnIncreaseBulletSpeed -= IncreaseBulletSpeed;
-        GameService.instance.OnIncreaseBulletDamage -= IncreaseBulletDamage;
-        GameService.instance.OnResetBulletSpeed -= ResetBulletSpeed;
-        GameService.instance.OnResetBulletDamage -= ResetBulletDamage;
+        _gameService.OnIncreaseBulletSpeed -= IncreaseBulletSpeed;
+        _gameService.OnIncreaseBulletDamage -= IncreaseBulletDamage;
+        _gameService.OnResetBulletSpeed -= ResetBulletSpeed;
+        _gameService.OnResetBulletDamage -= ResetBulletDamage;
     }
 }

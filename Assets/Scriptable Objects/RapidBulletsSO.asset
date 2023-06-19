@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 187302394a1b41c4583475d52b59201d, type: 3}
   m_Name: RapidBulletsSO
   m_EditorClassIdentifier: 
+  Id: 2
   PowerUptype: 2
   ExtraDamage: 0
   BulletSpeed: 3

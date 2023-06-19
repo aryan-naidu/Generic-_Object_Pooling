@@ -3,14 +3,16 @@ using UnityEngine;
 
 public class EnemyController
 {
+    private EnemyView _enemyView;
+    private EnemySO _enemySO;
+    private GameService _gameService;
     private Rigidbody _enemyRgbd;
     private Vector3 _target;
-    private EnemySO _enemySO;
-    private EnemyView _enemyView;
 
     public EnemyController(EnemyView enemy, EnemySO enemyScriptableObject)
     {
         _enemySO = enemyScriptableObject;
+        _gameService = GameService.Instance;
 
         Vector3 spawnPosition = GetRandomEdgeSpawnPosition();
         _enemyView = GameObject.Instantiate(enemy, spawnPosition, Quaternion.identity);
@@ -19,6 +21,7 @@ public class EnemyController
         // Because the player(target) is always at the center
         _target = new Vector3(0, 0, 0);
 
+        // Events happenning with enemy
         _enemyView.OnDamage += ApplyDamage;
         _enemyView.MoveEnemy += MoveTowardsTarget;
     }
@@ -78,15 +81,16 @@ public class EnemyController
 
     private void EnemyDestroyed()
     {
+        // So that till the time it is still active, it shouldn't collide with anything
         _enemyView.GetComponent<BoxCollider>().enabled = false;
 
         // Explode and destroy object
         _enemyView.Explode();
-        GameService.instance.StartCoroutine(DestroyEnemyObject());
+        _gameService.StartCoroutine(DestroyEnemyObject());
 
         // For Updating the gameplay UI
-        GameService.instance.GetEnemyService()._enemiesDestroyedCount++;
-        GameService.instance.OnEnemiesKilled?.Invoke(GameService.instance.GetEnemyService()._enemiesDestroyedCount);
+        _gameService.GetEnemyService()._enemiesDestroyedCount++;
+        _gameService.OnEnemiesKilled?.Invoke(GameService.Instance.GetEnemyService()._enemiesDestroyedCount);
 
         // Unsubscribe
         _enemyView.OnDamage -= ApplyDamage;

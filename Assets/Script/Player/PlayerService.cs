@@ -1,24 +1,18 @@
-using UnityEngine;
-
-public class PlayerService : MonoBehaviour
+public class PlayerService
 {
-    [SerializeField] private PlayerView _playerView;
-    [SerializeField] private BulletView _bulletView;
-    [SerializeField] private PlayerSO _playerSO;
-    [SerializeField] private BulletSO _bulletSO;
-
     private PlayerController _playerController;
 
     private int _bulletsFired;
-
-    public void Start()
+   
+    public PlayerService(PlayerView playerView, PlayerSO playerSO,BulletView bulletView, BulletSO bulletSO)
     {
-        _playerController = new PlayerController(_playerView, _playerSO,_bulletSO,_bulletView);
+        // Create the player
+        _playerController = new PlayerController(playerView, playerSO, bulletSO,bulletView);
     }
 
     public void OnBulletFired()
     {
         _bulletsFired++;
-        GameService.instance.OnBulletsFired?.Invoke(_bulletsFired);
+        GameService.Instance.OnBulletsFired?.Invoke(_bulletsFired);
     }
 }
