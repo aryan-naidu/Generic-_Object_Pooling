@@ -1,40 +1,50 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GenericObjectPool<T> where T : MonoBehaviour
+public class ObjectPool<T> where T : MonoBehaviour
 {
-    private Queue<T> objectQueue = new Queue<T>();
-    private T _object;
+    private readonly T _prefab;
+    private readonly List<T> _objectPool = new List<T>();
 
-    public GenericObjectPool(T obj)
+    public ObjectPool(T prefab)
     {
-        this._object = obj;
+        _prefab = prefab;
     }
 
     public T GetObject()
     {
-        if (objectQueue.Count == 0)
+        T obj = SearchPool();
+        if (obj == null)
         {
-            return CreateNewObject();
+            obj = CreateNewObject();
+            _objectPool.Add(obj);
         }
-        else
-        {
-            T obj = objectQueue.Dequeue();
-            obj.gameObject.SetActive(true);
-            return obj;
-        }
+
+        obj.gameObject.SetActive(true);
+        return obj;
     }
 
     public void ReturnObject(T obj)
     {
         obj.gameObject.SetActive(false);
-        objectQueue.Enqueue(obj);
+    }
+
+    private T SearchPool()
+    {
+        foreach (T obj in _objectPool)
+        {
+            if (!obj.gameObject.activeSelf)
+            {
+                return obj;
+            }
+        }
+        return null;
     }
 
     private T CreateNewObject()
     {
-        T newObj = Object.Instantiate(_object);
-        newObj.gameObject.SetActive(true);
-        return newObj;
+        T obj = GameObject.Instantiate(_prefab);
+        obj.gameObject.SetActive(false);
+        return obj;
     }
 }
