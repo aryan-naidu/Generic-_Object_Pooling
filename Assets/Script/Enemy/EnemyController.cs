@@ -1,3 +1,4 @@
+
 using System.Collections;
 using UnityEngine;
 
@@ -5,33 +6,53 @@ public class EnemyController
 {
     private EnemyView _enemyView;
     private EnemySO _enemySO;
-    private Rigidbody _enemyRgbd;
     private Vector3 _target;
 
-    public EnemyController(EnemyView enemyPrefab, EnemySO enemySO)
+    private int _initialDelayInSpawning;
+    private int _delayBetweenSpawning;
+
+    private int _enemiesSpawnedCount;
+
+    public EnemyController(EnemySO enemySO, int initialDelayInSpawning, int delayBetweenSpawning)
     {
-        _enemyView = GameObject.Instantiate(enemyPrefab);
-        _enemyView.transform.position = GetRandomEdgeSpawnPosition();
         _enemySO = enemySO;
-        _enemyRgbd = _enemyView.GetComponent<Rigidbody>();
 
-        Subscribe();
+        _initialDelayInSpawning = initialDelayInSpawning;
+        _delayBetweenSpawning = delayBetweenSpawning;
+
+        GameService.instance.StartCoroutine(SpawnEnemies());
     }
 
-    private void Subscribe()
+    private IEnumerator SpawnEnemies()
     {
-        // Subscribe to events
-        _enemyView.OnDamage += ApplyDamage;
-        _enemyView.MoveEnemy += MoveTowardsTarget;
+        yield return new WaitForSeconds(_initialDelayInSpawning);
+
+        while (true)
+        {
+            _enemyView = EnemyPool.GetEnemy();
+
+            // Setup enemy properties
+            Setup();
+
+            _enemyView.MoveEnemy += MoveTowardsTarget;
+            _enemyView.OnDead += OnEnemyDead;
+
+            // For Updating the Gameplay UI
+            _enemiesSpawnedCount++;
+            GameService.instance.OnEnemiesSpawned?.Invoke(_enemiesSpawnedCount);
+
+            // Wait for a delay before spawning the next enemy
+            yield return new WaitForSeconds(_delayBetweenSpawning);
+        }
     }
 
-    public void Setup(EnemySO enemySO)
+
+    public void Setup()
     {
-        _enemySO.Health = enemySO.Health;
+        _enemyView.SetHealth(_enemySO.Health);
         _enemyView.transform.position = GetRandomEdgeSpawnPosition();
         _enemyView.gameObject.SetActive(true);
-
-        Subscribe();
+        _enemyView.GetComponent<BoxCollider>().enabled = true;
     }
 
     private Vector3 GetRandomEdgeSpawnPosition()
@@ -61,9 +82,9 @@ public class EnemyController
         return spawnPosition;
     }
 
-    private void MoveTowardsTarget()
+    private void MoveTowardsTarget(Rigidbody rgbd, EnemyView enemyView)
     {
-        Vector3 direction = _target - _enemyView.transform.position;
+        Vector3 direction = _target - enemyView.transform.position;
         direction.Normalize();
 
         // Calculate the rotation angle to face the target
@@ -71,43 +92,15 @@ public class EnemyController
         Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
         // Smoothly rotate the enemy towards the target direction
-        _enemyRgbd.MoveRotation(Quaternion.RotateTowards(_enemyView.transform.rotation, targetRotation, 180f));
+        rgbd.MoveRotation(Quaternion.RotateTowards(enemyView.transform.rotation, targetRotation, 180f));
 
         // Move the enemy in the direction of the target
-        _enemyRgbd.velocity = direction * 3f;
+        rgbd.velocity = direction * 3f;
     }
 
-    public void ApplyDamage(int value)
+    private void OnEnemyDead()
     {
-        _enemySO.Health -= value;
-
-        if (_enemySO.Health <= 0)
-        {
-            EnemyDestroyed();
-        }
-    }
-
-    private void EnemyDestroyed()
-    {
-        _enemyView.GetComponent<BoxCollider>().enabled = false;
-
-        // Explode and destroy object
-        _enemyView.Explode();
-        GameService.instance.StartCoroutine(DestroyEnemyObject());
-
-        // For Updating the gameplay UI
-        GameService.instance.GetEnemyService()._enemiesDestroyedCount++;
-        GameService.instance.OnEnemiesKilled?.Invoke(GameService.instance.GetEnemyService()._enemiesDestroyedCount);
-
-        // Unsubscribe
-        _enemyView.OnDamage -= ApplyDamage;
         _enemyView.MoveEnemy -= MoveTowardsTarget;
-    }
-
-    private IEnumerator DestroyEnemyObject()
-    {
-        yield return new WaitForSeconds(0.5f);
-          _enemyView.gameObject.SetActive(false);
-        EnemyPool.ReturnEnemy(this);
+        _enemyView.OnDead -= OnEnemyDead;
     }
 }

@@ -1,37 +1,58 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-public class EnemyView : MonoBehaviour, IDamageble
+public class EnemyView : MonoBehaviour,IDamageble
 {
     [SerializeField] private GameObject _explosion;
+    private int _currentHealth;
+    private Rigidbody rgbd;
 
-    public Action<int> OnDamage;
-    public Action MoveEnemy;
+    public Action<Rigidbody,EnemyView> MoveEnemy;
+    public Action OnDead;
 
     private void OnEnable()
     {
         _explosion.SetActive(false);
-        GetComponent<BoxCollider>().enabled = true;
+        rgbd = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        // tell controller to apply move logic
-        MoveEnemy?.Invoke();
-    }
-
-    public void SetHealth(int value)
-    {
-
+        MoveEnemy?.Invoke(rgbd,this);
     }
 
     public void Damage(float value)
     {
-        OnDamage((int)value);
+        _currentHealth -= (int)value;
+        if (_currentHealth <= 0)
+        {
+            DestroyEnemy();
+        }
     }
 
-    public void Explode()
+    public void SetHealth(int health)
     {
+        _currentHealth = health;
+    }
+
+    private void DestroyEnemy()
+    {
+        GetComponent<BoxCollider>().enabled = false;
+        // Explode and destroy object
         _explosion.SetActive(true);
+        GameService.instance.StartCoroutine(DestroyEnemyObject());
+
+        OnDead?.Invoke();
+
+        // For Updating the gameplay UI
+        GameService.instance.GetEnemyService()._enemiesDestroyedCount++;
+        GameService.instance.OnEnemiesKilled?.Invoke(GameService.instance.GetEnemyService()._enemiesDestroyedCount);
+    }
+
+    private IEnumerator DestroyEnemyObject()
+    {
+        yield return new WaitForSeconds(0.5f);
+        EnemyPool.ReturnEnemy(this);
     }
 }
