@@ -16,14 +16,17 @@ public class PlayerController
     private BulletController _bulletController;
 
     public Action OnBulletFired;
+    private GameService _gameService;
 
     public PlayerController(PlayerView playerView, PlayerSO playerSO, BulletController bulletController)
     {
         _bulletController = bulletController;
         _playerSO = playerSO;
+        _gameService = GameService.Instance;
         _playerView = GameObject.Instantiate(playerView);
         _playerView.transform.position = new Vector3(0, 0, 0);
-
+              
+        // Events happening with the player
         _playerView.OnCursorMove += RotatePlayer;
         _playerView.OnPressShoot += FireBullet;
         _playerView.OnDispose += Dispose;
@@ -31,10 +34,11 @@ public class PlayerController
         _originalBulletSpeed = _currentBulletSpeed = _playerSO.BulletSO.Speed;
         _originalBulletDamage = _currentBulletDamage = _playerSO.BulletSO.Damage;
 
-        GameService.instance.OnIncreaseBulletSpeed += IncreaseBulletSpeed;
-        GameService.instance.OnIncreaseBulletDamage += IncreaseBulletDamage;
-        GameService.instance.OnResetBulletSpeed += ResetBulletSpeed;
-        GameService.instance.OnResetBulletDamage += ResetBulletDamage;
+        // Bullet related
+        _gameService.OnIncreaseBulletSpeed += IncreaseBulletSpeed;
+        _gameService.OnIncreaseBulletDamage += IncreaseBulletDamage;
+        _gameService.OnResetBulletSpeed += ResetBulletSpeed;
+        _gameService.OnResetBulletDamage += ResetBulletDamage;
     }
 
     #region Player Input Functionality
@@ -83,9 +87,9 @@ public class PlayerController
         _playerView.OnPressShoot -= FireBullet;
         _playerView.OnDispose -= Dispose;
 
-        GameService.instance.OnIncreaseBulletSpeed -= IncreaseBulletSpeed;
-        GameService.instance.OnIncreaseBulletDamage -= IncreaseBulletDamage;
-        GameService.instance.OnResetBulletSpeed -= ResetBulletSpeed;
-        GameService.instance.OnResetBulletDamage -= ResetBulletDamage;
+        _gameService.OnIncreaseBulletSpeed -= IncreaseBulletSpeed;
+        _gameService.OnIncreaseBulletDamage -= IncreaseBulletDamage;
+        _gameService.OnResetBulletSpeed -= ResetBulletSpeed;
+        _gameService.OnResetBulletDamage -= ResetBulletDamage;
     }
 }

@@ -55,7 +55,7 @@ public class PlayerView : MonoBehaviour, IDamageble
     private IEnumerator GameOver()
     {
         yield return new WaitForSeconds(0.5f);
-        GameService.instance.GetUiView().EnableGameOverScreen();
+        GameService.Instance.GetUiView().EnableGameOverScreen();
     }
 
     public void Damage(float value)

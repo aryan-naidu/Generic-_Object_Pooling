@@ -10,6 +10,7 @@ public class EnemyView : MonoBehaviour,IDamageble
 
     public Action<Rigidbody,EnemyView> MoveEnemy;
     public Action OnDead;
+    public bool IsUsed;
 
     private void OnEnable()
     {
@@ -41,13 +42,13 @@ public class EnemyView : MonoBehaviour,IDamageble
         GetComponent<BoxCollider>().enabled = false;
         // Explode and destroy object
         _explosion.SetActive(true);
-        GameService.instance.StartCoroutine(DestroyEnemyObject());
+        GameService.Instance.StartCoroutine(DestroyEnemyObject());
 
         OnDead?.Invoke();
 
         // For Updating the gameplay UI
-        GameService.instance.GetEnemyService()._enemiesDestroyedCount++;
-        GameService.instance.OnEnemiesKilled?.Invoke(GameService.instance.GetEnemyService()._enemiesDestroyedCount);
+        GameService.Instance.GetEnemyService()._enemiesDestroyedCount++;
+        GameService.Instance.OnEnemiesKilled?.Invoke(GameService.Instance.GetEnemyService()._enemiesDestroyedCount);
     }
 
     private IEnumerator DestroyEnemyObject()

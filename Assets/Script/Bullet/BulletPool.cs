@@ -1,30 +1,63 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPool : GenericObjectPool<BulletView>
+public class BulletPool : MonoBehaviour
 {
-    private static BulletPool _instance;
-
-    // It takes a BulletView prefab as a parameter and passes it to the base class constructor (base(prefab)).
-    private BulletPool(BulletView prefab) : base(prefab) { }
+    private static BulletView _bulletPrefab;
+    private static List<BulletView> _bulletPool = new List<BulletView>();
 
     public static void Initialize(BulletView bulletPrefab)
     {
-        if (_instance != null)
-        {
-            Debug.LogWarning("BulletPool is already initialized!");
-            return;
-        }
-
-        _instance = new BulletPool(bulletPrefab);
+        _bulletPrefab = bulletPrefab;
     }
 
     public static BulletView GetBullet()
     {
-        return _instance.GetObject();
+        BulletView bullet;
+
+        if (_bulletPool.Count > 0)
+        {
+            bullet = FindAvailableBullet();
+            if (bullet == null)
+            {
+                bullet = CreateNewBullet();
+                _bulletPool.Add(bullet);
+            }
+        }
+        else
+        {
+            bullet = CreateNewBullet();
+            _bulletPool.Add(bullet);
+        }
+
+        bullet.gameObject.SetActive(true);
+        bullet.IsUsed = true;
+        return bullet;
+    }
+
+    private static BulletView FindAvailableBullet()
+    {
+        foreach (BulletView bullet in _bulletPool)
+        {
+            if (!bullet.IsUsed)
+            {
+                return bullet;
+            }
+        }
+        return null;
+    }
+
+    private static BulletView CreateNewBullet()
+    {
+        BulletView bullet = GameObject.Instantiate(_bulletPrefab).GetComponent<BulletView>();
+        bullet.IsUsed = false;
+        bullet.gameObject.SetActive(false);
+        return bullet;
     }
 
     public static void ReturnBullet(BulletView bullet)
     {
-        _instance.ReturnObject(bullet);
+        bullet.gameObject.SetActive(false);
+        bullet.IsUsed = false;
     }
 }

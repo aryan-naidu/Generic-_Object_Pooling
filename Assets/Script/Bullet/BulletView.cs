@@ -5,6 +5,7 @@ public class BulletView : MonoBehaviour
 {
     private int _damageValue;
     public Action OnBulletDispose;
+    public bool IsUsed;
 
    public void SetDamageValue(int damageValue)
     {

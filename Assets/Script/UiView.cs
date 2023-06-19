@@ -16,9 +16,9 @@ public class UiView : MonoBehaviour
         OnEnemiesKilled(0);
         OnEnemiesSpawned(0);
 
-        GameService.instance.OnBulletsFired += OnBulletsFired;
-        GameService.instance.OnEnemiesSpawned += OnEnemiesSpawned;
-        GameService.instance.OnEnemiesKilled += OnEnemiesKilled;
+        GameService.Instance.OnBulletsFired += OnBulletsFired;
+        GameService.Instance.OnEnemiesSpawned += OnEnemiesSpawned;
+        GameService.Instance.OnEnemiesKilled += OnEnemiesKilled;
     }
 
     private void OnBulletsFired(int count)

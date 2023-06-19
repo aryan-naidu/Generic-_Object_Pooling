@@ -20,7 +20,7 @@ public class EnemyController
         _initialDelayInSpawning = initialDelayInSpawning;
         _delayBetweenSpawning = delayBetweenSpawning;
 
-        GameService.instance.StartCoroutine(SpawnEnemies());
+        GameService.Instance.StartCoroutine(SpawnEnemies());
     }
 
     private IEnumerator SpawnEnemies()
@@ -39,13 +39,12 @@ public class EnemyController
 
             // For Updating the Gameplay UI
             _enemiesSpawnedCount++;
-            GameService.instance.OnEnemiesSpawned?.Invoke(_enemiesSpawnedCount);
+            GameService.Instance.OnEnemiesSpawned?.Invoke(_enemiesSpawnedCount);
 
             // Wait for a delay before spawning the next enemy
             yield return new WaitForSeconds(_delayBetweenSpawning);
         }
     }
-
 
     public void Setup()
     {
