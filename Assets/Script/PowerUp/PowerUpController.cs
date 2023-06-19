@@ -1,21 +1,26 @@
 using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 public class PowerUpController
 {
     private PowerUpView _powerUpView;
     private PowerUpSO _powerUpSO;
-    private Coroutine _powerUpCoroutine;
+    private GameService _gameService;
 
-    private float _minDistanceFromPlayer = 3f;
+    private float _minSpawnDistanceFromPlayer = 3f;
+    public 
+        Action<PowerUpType> OnPowerUpExpired;
 
     public PowerUpController(PowerUpView powerUpView, PowerUpSO powerUpSO)
     {
         _powerUpView = GameObject.Instantiate(powerUpView);
         _powerUpView.transform.position = GetRandomSpawnPoint();
         _powerUpSO = powerUpSO;
+        _gameService = GameService.Instance;
 
-        _powerUpView.ActivatePowerUp += ApplyPowerUp;
+        _powerUpView.ActivatePowerUp += ActivatePowerUp;
     }
 
     private Vector3 GetRandomSpawnPoint()
@@ -35,67 +40,58 @@ public class PowerUpController
         float distanceFromPlayer = direction.magnitude;
 
         // Check if the random point is too close to the player, adjust if necessary
-        if (distanceFromPlayer < _minDistanceFromPlayer)
+        if (distanceFromPlayer < _minSpawnDistanceFromPlayer)
         {
-            randomPoint += direction.normalized * (_minDistanceFromPlayer - distanceFromPlayer);
+            randomPoint += direction.normalized * (_minSpawnDistanceFromPlayer - distanceFromPlayer);
         }
 
         return randomPoint;
     }
 
-    #region When PowerUp Activates
-    public void ApplyPowerUp()
+    public void ActivatePowerUp()
     {
-        if (_powerUpCoroutine != null)
+        _powerUpView.ActivatePowerUp -= ActivatePowerUp;
+
+      _gameService.StartCoroutine(PowerUpCoroutine());
+    }
+
+    private IEnumerator PowerUpCoroutine()
+    {
+        switch (_powerUpSO.PowerUptype)
         {
-            // If a power-up is already active, stop the coroutine before starting a new one
-            GameService.Instance.StopCoroutine(_powerUpCoroutine);
+            case PowerUpType.DoubleCannon:
+                GameService.Instance.OnIncreaseBulletDamage?.Invoke(_powerUpSO.ExtraDamage);
+                break;
+
+            case PowerUpType.RapidBullets:
+                GameService.Instance.OnIncreaseBulletSpeed?.Invoke(_powerUpSO.BulletSpeed);
+                break;
+
+            case PowerUpType.Shield:
+                GameService.Instance.OnActivateSheild?.Invoke();
+                break;
         }
 
-        // Unsubscribe
-        _powerUpView.ActivatePowerUp += ApplyPowerUp;
+        yield return new WaitForSeconds(_powerUpSO.Timer);
 
         switch (_powerUpSO.PowerUptype)
         {
             case PowerUpType.DoubleCannon:
-                _powerUpCoroutine = GameService.Instance.StartCoroutine(DoubleCannonPowerUpCoroutine());
+                GameService.Instance.OnResetBulletDamage?.Invoke();
                 break;
 
             case PowerUpType.RapidBullets:
-                _powerUpCoroutine = GameService.Instance.StartCoroutine(RapidBulletsPowerUpCoroutine());
+                GameService.Instance.OnResetBulletSpeed?.Invoke();
                 break;
 
             case PowerUpType.Shield:
-                _powerUpCoroutine = GameService.Instance.StartCoroutine(ShieldPowerUpCoroutine());
+                GameService.Instance.OnDeactivateShield?.Invoke();
                 break;
         }
-    }
 
-    private IEnumerator DoubleCannonPowerUpCoroutine()
-    {
-        GameService.Instance.OnIncreaseBulletDamage?.Invoke(_powerUpSO.ExtraDamage);
-        yield return new WaitForSeconds(_powerUpSO.Timer);
-
-        // Reset damage to original value
-        GameService.Instance.OnResetBulletDamage?.Invoke();
-    }
-
-    private IEnumerator RapidBulletsPowerUpCoroutine()
-    {
-        GameService.Instance.OnIncreaseBulletSpeed?.Invoke(_powerUpSO.BulletSpeed);
-        yield return new WaitForSeconds(_powerUpSO.Timer);
-
-        // Reset speed to original value
-        GameService.Instance.OnResetBulletSpeed?.Invoke();
-    }
-    #endregion
-
-    private IEnumerator ShieldPowerUpCoroutine()
-    {
-        GameService.Instance.OnActivateSheild?.Invoke();
-        yield return new WaitForSeconds(_powerUpSO.Timer);
-
-        // Deactivate the shield
-        GameService.Instance.OnDeactivateShield?.Invoke();
+        if (OnPowerUpExpired != null)
+        {
+            OnPowerUpExpired?.Invoke(_powerUpSO.PowerUptype);
+        }
     }
 }

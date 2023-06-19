@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPool
+public class BulletPool : MonoBehaviour
 {
     private static BulletView _bulletPrefab;
-    private static Queue<BulletView> _bulletPool = new Queue<BulletView>();
+    private static List<BulletView> _bulletPool = new List<BulletView>();
 
     public static void Initialize(BulletView bulletPrefab)
     {
@@ -17,27 +17,47 @@ public class BulletPool
 
         if (_bulletPool.Count > 0)
         {
-            Debug.Log("reuisng");
-            bullet = _bulletPool.Dequeue();
-            bullet.gameObject.SetActive(true);
+            bullet = FindAvailableBullet();
+            if (bullet == null)
+            {
+                bullet = CreateNewBullet();
+                _bulletPool.Add(bullet);
+            }
         }
         else
         {
             bullet = CreateNewBullet();
+            _bulletPool.Add(bullet);
         }
+
+        bullet.gameObject.SetActive(true);
+        bullet.IsUsed = true;
         return bullet;
+    }
+
+    private static BulletView FindAvailableBullet()
+    {
+        foreach (BulletView bullet in _bulletPool)
+        {
+            if (!bullet.IsUsed)
+            {
+                return bullet;
+            }
+        }
+        return null;
     }
 
     private static BulletView CreateNewBullet()
     {
-        Debug.Log("new");
-        BulletView bullet = GameObject.Instantiate(_bulletPrefab);
+        BulletView bullet = GameObject.Instantiate(_bulletPrefab).GetComponent<BulletView>();
+        bullet.IsUsed = false;
+        bullet.gameObject.SetActive(false);
         return bullet;
     }
 
     public static void ReturnBullet(BulletView bullet)
     {
         bullet.gameObject.SetActive(false);
-        _bulletPool.Enqueue(bullet);
+        bullet.IsUsed = false;
     }
 }

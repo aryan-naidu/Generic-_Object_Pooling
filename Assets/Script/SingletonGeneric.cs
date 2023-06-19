@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class SingletonGeneric<T> : MonoBehaviour where T : SingletonGeneric<T>
 {
-    public static T instance;
-    public static T Instance { get { return instance; } }
+    private static T _instance;
+    public static T Instance { get { return _instance; } }
 
     protected virtual void Awake()
     {
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = (T)this;
+            _instance = (T)this;
         }
         else
         {

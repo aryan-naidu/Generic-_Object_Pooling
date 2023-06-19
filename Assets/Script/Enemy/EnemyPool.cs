@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyPool
+public class EnemyPool : MonoBehaviour
 {
     private static EnemyView _enemyPrefab;
-    private static Queue<EnemyView> _enemyPool = new Queue<EnemyView>();
+    private static List<EnemyView> _enemyPool = new List<EnemyView>();
 
     public static void Initialize(EnemyView enemyPrefab)
     {
@@ -17,27 +17,47 @@ public class EnemyPool
 
         if (_enemyPool.Count > 0)
         {
-            enemy = _enemyPool.Dequeue();
-            enemy.gameObject.SetActive(true);
-            Debug.Log("resusing");
+            enemy = FindAvailableEnemy();
+            if (enemy == null)
+            {
+                enemy = CreateNewEnemy();
+                _enemyPool.Add(enemy);
+            }
         }
         else
         {
             enemy = CreateNewEnemy();
+            _enemyPool.Add(enemy);
         }
+
+        enemy.gameObject.SetActive(true);
+        enemy.IsUsed = true;
         return enemy;
+    }
+
+    private static EnemyView FindAvailableEnemy()
+    {
+        foreach (EnemyView enemy in _enemyPool)
+        {
+            if (!enemy.IsUsed)
+            {
+                return enemy;
+            }
+        }
+        return null;
     }
 
     private static EnemyView CreateNewEnemy()
     {
-        Debug.Log("new");
-        EnemyView enemy = GameObject.Instantiate(_enemyPrefab);
+        EnemyView enemy = GameObject.Instantiate(_enemyPrefab).GetComponent<EnemyView>();
+        enemy.IsUsed = false;
+        enemy.gameObject.SetActive(false);
         return enemy;
     }
 
     public static void ReturnEnemy(EnemyView enemy)
     {
         enemy.gameObject.SetActive(false);
-        _enemyPool.Enqueue(enemy);
+        enemy.IsUsed = false;
     }
 }
