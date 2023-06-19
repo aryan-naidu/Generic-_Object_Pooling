@@ -1,97 +1,75 @@
-using System.Collections;
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using UnityEngine;
 
 public class PowerUpController
 {
     private PowerUpView _powerUpView;
-    private PowerUpSO _powerUpSO;
-    private GameService _gameService;
+    private PowerUpTimeController _powerUpTimeController;
 
-    private float _minSpawnDistanceFromPlayer = 3f;
-    public 
-        Action<PowerUpType> OnPowerUpExpired;
+    public event Action<PowerUpType, float> ActivatePowerUp;
+    public event Action<PowerUpController> DeactivatePowerUp;
 
     public PowerUpController(PowerUpView powerUpView, PowerUpSO powerUpSO)
     {
         _powerUpView = GameObject.Instantiate(powerUpView);
-        _powerUpView.transform.position = GetRandomSpawnPoint();
-        _powerUpSO = powerUpSO;
-        _gameService = GameService.Instance;
 
-        _powerUpView.ActivatePowerUp += ActivatePowerUp;
+        _powerUpView.Initialize(powerUpSO.PowerUptype, powerUpSO.Timer);
+        _powerUpView.transform.position = GetRandomSpawnPosition(new Vector3(0, 0, 0), 2f);
+        _powerUpView.OnApplyPowerUp += ApplyPowerUp;
+
+        _powerUpTimeController = new PowerUpTimeController();
+    }
+    private Vector3 GetRandomSpawnPosition(Vector3 playerPosition, float minDistanceFromPlayer)
+    {
+        // Get the screen boundaries in world space
+        Vector3 screenMin = Camera.main.ScreenToWorldPoint(Vector3.zero);
+        Vector3 screenMax = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
+
+        Vector3 spawnPosition = Vector3.zero;
+        bool isValidSpawnPosition = false;
+
+        // Generate a random position until a valid one is found
+        while (!isValidSpawnPosition)
+        {
+            // Generate a random position within the screen boundaries
+            spawnPosition = new Vector3(UnityEngine.Random.Range(screenMin.x, screenMax.x), UnityEngine.Random.Range(screenMin.y, screenMax.y), 0f);
+
+            // Calculate the distance between the spawn position and the player position
+            float distanceFromPlayer = Vector3.Distance(spawnPosition, playerPosition);
+
+            // Check if the distance is greater than the minimum required distance
+            if (distanceFromPlayer > minDistanceFromPlayer)
+            {
+                isValidSpawnPosition = true;
+            }
+        }
+
+        return spawnPosition;
     }
 
-    private Vector3 GetRandomSpawnPoint()
+
+    private void ApplyPowerUp()
     {
-        // Generate a random point within the screen bounds
-        float x = UnityEngine.Random.Range(0f, Screen.width);
-        float y = UnityEngine.Random.Range(0f, Screen.height);
+        // Get power-up type and duration from the PowerUpView or PowerUpSO
+        PowerUpType powerUpType = _powerUpView.PowerUpType;
+        float duration = _powerUpView.Duration;
 
-        Vector3 randomPoint = new Vector3(x, y, 0f);
-
-        // Convert the screen point to world coordinates
-        randomPoint = Camera.main.ScreenToWorldPoint(randomPoint);
-        randomPoint.z = 0f; // Set z position to 0
-
-        // Calculate the direction from the player(0,0,0) to the random point
-        Vector3 direction = randomPoint;
-        float distanceFromPlayer = direction.magnitude;
-
-        // Check if the random point is too close to the player, adjust if necessary
-        if (distanceFromPlayer < _minSpawnDistanceFromPlayer)
-        {
-            randomPoint += direction.normalized * (_minSpawnDistanceFromPlayer - distanceFromPlayer);
-        }
-
-        return randomPoint;
+        ActivatePowerUp?.Invoke(powerUpType, duration);
     }
 
-    public void ActivatePowerUp()
+    public void StartTimer(float duration)
     {
-        _powerUpView.ActivatePowerUp -= ActivatePowerUp;
-
-      _gameService.StartCoroutine(PowerUpCoroutine());
+        _powerUpTimeController.StartTimer(duration);
     }
 
-    private IEnumerator PowerUpCoroutine()
+    public void StopTimer()
     {
-        switch (_powerUpSO.PowerUptype)
-        {
-            case PowerUpType.DoubleCannon:
-                GameService.Instance.OnIncreaseBulletDamage?.Invoke(_powerUpSO.ExtraDamage);
-                break;
+        _powerUpTimeController.StopTimer();
+        DeactivatePowerUp?.Invoke(this);
+    }
 
-            case PowerUpType.RapidBullets:
-                GameService.Instance.OnIncreaseBulletSpeed?.Invoke(_powerUpSO.BulletSpeed);
-                break;
-
-            case PowerUpType.Shield:
-                GameService.Instance.OnActivateSheild?.Invoke();
-                break;
-        }
-
-        yield return new WaitForSeconds(_powerUpSO.Timer);
-
-        switch (_powerUpSO.PowerUptype)
-        {
-            case PowerUpType.DoubleCannon:
-                GameService.Instance.OnResetBulletDamage?.Invoke();
-                break;
-
-            case PowerUpType.RapidBullets:
-                GameService.Instance.OnResetBulletSpeed?.Invoke();
-                break;
-
-            case PowerUpType.Shield:
-                GameService.Instance.OnDeactivateShield?.Invoke();
-                break;
-        }
-
-        if (OnPowerUpExpired != null)
-        {
-            OnPowerUpExpired?.Invoke(_powerUpSO.PowerUptype);
-        }
+    public void UpdateTimer()
+    {
+        _powerUpTimeController.UpdateTimer();
     }
 }

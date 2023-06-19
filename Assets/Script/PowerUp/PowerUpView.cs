@@ -3,11 +3,20 @@ using UnityEngine;
 
 public class PowerUpView : MonoBehaviour
 {
-    public Action ActivatePowerUp;
+    public PowerUpType PowerUpType { get; private set; }
+    public float Duration { get; private set; }
+
+    public event Action OnApplyPowerUp;
+
+    public void Initialize(PowerUpType powerUpType, float duration)
+    {
+        PowerUpType = powerUpType;
+        Duration = duration;
+    }
 
     public void ApplyPowerUp()
     {
-        ActivatePowerUp?.Invoke();
+        OnApplyPowerUp?.Invoke();
         Destroy(gameObject);
     }
 }

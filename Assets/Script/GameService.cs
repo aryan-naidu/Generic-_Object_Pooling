@@ -60,7 +60,7 @@ public class GameService : SingletonGeneric<GameService>
     private void InitializeServices()
     {
         _playerService = new PlayerService(_playerView, _playerSO, _bulletView, _bulletSO);
-        _enemyService = new EnemyService(_enemySO, _enemyView, _initialDelayInSpawning, _delayBetweenSpawning);
+       // _enemyService = new EnemyService(_enemySO, _enemyView, _initialDelayInSpawning, _delayBetweenSpawning);
         _powerUpService = new PowerUpService(_powerUpViewList, _powerUpSOList, spawnInterval);
         _soundService = new SoundService(_soundScriptableList);
         _vfxService = new VfxService();
